@@ -1,10 +1,12 @@
-from app.core.database import SessionLocal
+from app.core.database import SessionLocal, engine
 from app.services.gemini_service import GeminiService
 from app.repositories.chat_repository import ChatRepository
 from app.schemas.chat import MensagemChat
+from app.models.chat import Base
 from datetime import datetime
 
 def main():
+    Base.metadata.create_all(bind=engine)
     db = SessionLocal()
     try:
         gemini_service = GeminiService()
