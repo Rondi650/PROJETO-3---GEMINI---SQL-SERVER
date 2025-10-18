@@ -16,7 +16,7 @@ def main():
             # Interface com usuário
             entrada_usuario = input('Chat: ')
             
-            # Verificar saída ANTES de processar
+            model = "gemini-2.0-flash-exp"
             if entrada_usuario.lower() == 'sair':
                 print("Encerrando chat...")
                 break
@@ -26,19 +26,22 @@ def main():
                 usuario="Rondinelle",
                 mensagem=entrada_usuario,
                 origem="usuario",
-                data_hora=datetime.now()
+                data_hora=datetime.now(),
+                model=model
             )
             chat_repository.salvar_mensagem(mensagem_usuario)
             
-            # Obter resposta da IA (já imprime em streaming)
-            resposta = gemini_service.gerar_resposta(entrada_usuario)
+            # Obter resposta da IA
+            
+            resposta = gemini_service.gerar_resposta(entrada_usuario, model=model)
             
             # Salvar resposta da IA
             mensagem_bot = MensagemChat(
                 usuario="Assistente",
                 mensagem=resposta,
                 origem="bot",
-                data_hora=datetime.now()
+                data_hora=datetime.now(),
+                model=model
             )
             chat_repository.salvar_mensagem(mensagem_bot)
                

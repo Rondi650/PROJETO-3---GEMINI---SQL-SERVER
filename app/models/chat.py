@@ -13,3 +13,4 @@ class HistoricoChat(Base):
     mensagem: Mapped[str] = mapped_column(String)
     origem: Mapped[str] = mapped_column(String(20), nullable=False)
     data_hora: Mapped[datetime] = mapped_column(DateTime)  # datetime de Python dentro do Mapped
+    model: Mapped[str] = mapped_column(String(100))

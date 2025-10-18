@@ -10,10 +10,10 @@ class GeminiService:
         self.api_key = os.getenv('GEMINI_KEY')
         self.client = genai.Client(api_key=self.api_key)
         
-    def gerar_resposta(self, pergunta: str) -> str:
+    def gerar_resposta(self, pergunta: str, model: str) -> str:
         try:
             response = self.client.models.generate_content(
-                model="gemini-2.5-flash",
+                model=model,
                 contents=pergunta,
                 config=types.GenerateContentConfig(
                     system_instruction="Você é um analista de planejamento de Call Center",

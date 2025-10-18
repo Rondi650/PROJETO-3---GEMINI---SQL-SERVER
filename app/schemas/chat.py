@@ -9,4 +9,5 @@ class MensagemChat(BaseModel):
     mensagem: str
     origem: Annotated[str, Field(max_length=20)]
     data_hora: datetime
+    model: Annotated[str, Field(max_length=100)]
     
