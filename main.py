@@ -1,10 +1,14 @@
-from app.core.database import SessionLocal
+from app.core.database import SessionLocal, engine
 from app.services.gemini_service import GeminiService
 from app.repositories.chat_repository import ChatRepository
 from app.schemas.chat import MensagemChat
 from datetime import datetime
+from app.models.chat import Base
 
 def main():
+    # Criar tabelas se não existirem
+    Base.metadata.create_all(bind=engine)
+    
     # Instanciar dependências
     db = SessionLocal()
     try:

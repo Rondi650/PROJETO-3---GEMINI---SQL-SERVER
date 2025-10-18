@@ -1,5 +1,6 @@
 from sqlalchemy import  String, DateTime
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from datetime import datetime
  
 class Base(DeclarativeBase):
     pass
@@ -11,4 +12,4 @@ class HistoricoChat(Base):
     usuario: Mapped[str] = mapped_column(String(100), nullable=False)
     mensagem: Mapped[str] = mapped_column(String)
     origem: Mapped[str] = mapped_column(String(20), nullable=False)
-    data_hora: Mapped[DateTime] = mapped_column(nullable=False)
+    data_hora: Mapped[datetime] = mapped_column(DateTime)  # datetime de Python dentro do Mapped
