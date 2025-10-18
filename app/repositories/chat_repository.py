@@ -7,8 +7,12 @@ class ChatRepository:
         
     def salvar_mensagem(self, mensagem: MensagemChat):
         registro = HistoricoChat(**mensagem.dict())
-        self.db.add(registro)
-        self.db.commit()
+        try:
+            self.db.add(registro)
+            self.db.commit()
+        except Exception as e:
+            print(f'Erro: {e}')
+            self.db.rollback()
         
     def obter_historico(self, usuario=None):
         query = self.db.query(HistoricoChat)
