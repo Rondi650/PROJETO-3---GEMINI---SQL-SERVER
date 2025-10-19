@@ -1,7 +1,6 @@
 from ollama import chat
 
 class OllamaService:
-        
     def gerar_resposta(self, pergunta: str, model: str) -> str:
         try:
             messages = [
