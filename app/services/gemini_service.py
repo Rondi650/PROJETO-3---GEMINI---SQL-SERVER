@@ -1,4 +1,3 @@
-# app/services/gemini_service.py
 from google import genai
 from google.genai import types
 import os
@@ -16,7 +15,7 @@ class GeminiService:
                 model=model,
                 contents=pergunta,
                 config=types.GenerateContentConfig(
-                    system_instruction="Você é um analista de planejamento de Call Center",
+                    system_instruction="Voce e meu assistente virtual",
                     temperature=0.5
                 ),
             )
@@ -25,4 +24,5 @@ class GeminiService:
             return texto
         
         except Exception as e:
+            print(f"Erro ao consultar Gemini: {e}")
             return f"Erro ao consultar Gemini: {e}"

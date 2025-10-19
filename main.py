@@ -27,8 +27,8 @@ def main():
             entrada_usuario = input('Chat: ')
             
             '''CONFIGURACOES'''
-            model = "llama3.2:3b" 
-            service_ativo = ollama_services  # ou gemini_service
+            model = "gemini-2.5-pro" 
+            service_ativo = gemini_service  # ou gemini_service
             
             # Encerra a conversa
             if entrada_usuario.lower() == 'sair':
