@@ -20,7 +20,6 @@ class GeminiService:
                 ),
             )
             texto = response.text if response.text is not None else "Sem resposta da API."
-            print(texto)
             return texto
         
         except Exception as e:

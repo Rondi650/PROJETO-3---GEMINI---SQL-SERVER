@@ -19,10 +19,8 @@ class OllamaService:
             # Exibe resposta em tempo real
             resposta = ''
             for part in stream:
-                print(part['message']['content'], end='', flush=True)
                 resposta += part['message']['content']
-            print()  # Nova linha após resposta
-            return resposta  # Adicione este retorno
+            return resposta
         except Exception as e:
             print(f"Erro ao consultar Ollama: {e}")
             return f"Erro ao consultar Ollama: {e}"
