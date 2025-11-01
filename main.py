@@ -18,7 +18,7 @@ def main():
     try:
         # Instancia os serviços
         gemini_service = GeminiService()
-        ollama_services = OllamaService()
+        ollama_service = OllamaService()
         chat_repository = ChatRepository(db)
         
         # Loop principal
@@ -28,10 +28,10 @@ def main():
             
             '''CONFIGURACOES'''
             model = "gemini-2.5-pro" 
-            service_ativo = gemini_service  # ou gemini_service
+            service_ativo = gemini_service
             
             # Encerra a conversa
-            if entrada_usuario.lower() == 'sair':
+            if entrada_usuario.lower() in ['sair', 'exit', 'quit', 'q', 'fim', 'terminate', 'end', 'close']:
                 print("Encerrando chat...")
                 break
             
