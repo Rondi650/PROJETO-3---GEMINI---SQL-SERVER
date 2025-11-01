@@ -14,7 +14,12 @@ ollama = OllamaService()
 openai = OpenAIService()
 chat_repo = ChatRepository(db)
 
-def responder(mensagem: str, history: list[dict[str, str]], system_message: str, servico: str, modelo: str, temperature: float = 1.0):
+def responder(mensagem: str, 
+    history: list[dict[str, str]], 
+    system_message: str, 
+    servico: str, 
+    modelo: str, 
+    temperature: float = 1.0):
     """
     Processa mensagem do usuário, obtém resposta do modelo de IA e persiste no banco.
     
@@ -39,8 +44,10 @@ def responder(mensagem: str, history: list[dict[str, str]], system_message: str,
         messages.append({"role": "user", "content": mensagem})
         
         # Formata mensagens em texto para envio ao modelo
-        linhas = [f"{msg.get('role')}: {msg.get('content', '')}" for msg in messages]
-        prompt = "\n".join(linhas)
+        lista = []
+        for msg in messages:
+            lista.append(f"{msg['role']}: {msg['content']}")
+        prompt = "\n".join(lista)
         
         # Seleciona serviço de IA e obtém resposta
         if servico == "Gemini":

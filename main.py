@@ -41,13 +41,17 @@ def main():
                 "role": "user", 
                 "content": entrada_usuario
             })
-            
+
             # Formata histórico em texto para enviar ao modelo
-            prompt = "\n".join([f"{msg['role']}: {msg['content']}" for msg in historico])
-            
+            lista = []
+            for msg in historico:
+                lista.append(f"{msg['role']}: {msg['content']}")
+            prompt = "\n".join(lista)
+
             # Obtém resposta do modelo de IA
             resposta = service_ativo.gerar_resposta(
-                prompt, model=model, 
+                prompt, 
+                model=model, 
                 temperature=1.0)
             
             # Adiciona resposta ao histórico
