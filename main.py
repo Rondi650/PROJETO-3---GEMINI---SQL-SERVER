@@ -31,7 +31,7 @@ def main():
             service_ativo = gemini_service
             
             # Encerra a conversa
-            if entrada_usuario.lower() in ['sair', 'exit', 'quit', 'q', 'fim', 'terminate', 'end', 'close']:
+            if entrada_usuario.lower() in ['sair', 'exit', 'quit', 'bye', 'fim', 'terminate', 'end', 'close']:
                 print("Encerrando chat...")
                 break
             
