@@ -14,55 +14,57 @@ def inicializar_ambiente():
     Base.metadata.create_all(bind=engine)
 
 def main():
-    # Conecta na sessão do banco de dados
     db = SessionLocal()
     try:
-        # Instancia os serviços
         gemini_service = GeminiService()
         ollama_service = OllamaService()
         openai_service = OpenAIService()
         chat_repository = ChatRepository(db)
         
-        # Loop principal
+        historico = []  # ← Adiciona histórico local
+        
         while True:
-            # Interface com usuário
             entrada_usuario = input('Chat: ')
             
-            '''CONFIGURACOES'''
-            model = "gpt-5-nano-2025-08-07" 
+            model = "gpt-5-nano-2025-08-07"
             service_ativo = openai_service
             
-            # Encerra a conversa
-            if entrada_usuario.lower() in ['sair', 'exit', 'quit', 'bye', 'fim', 'terminate', 'end', 'close']:
-                print("Encerrando chat...")
+            if entrada_usuario.lower() in ['sair', 'exit', 'quit', 'bye', 'fim']:
                 break
             
-            # Processar mensagem do usuário
-            mensagem_usuario = MensagemChat(
-                usuario="Rondinelle",
-                mensagem=entrada_usuario,
-                origem="usuario",
-                data_hora=datetime.now(),
+            # ← Adiciona mensagem ao histórico
+            historico.append({"role": "user", "content": entrada_usuario})
+            
+            # ← Formata histórico em texto
+            prompt = "\n".join([f"{msg['role']}: {msg['content']}" for msg in historico])
+            
+            # ← Envia histórico ao bot
+            resposta = service_ativo.gerar_resposta(prompt, model=model, temperature=1.0)
+            
+            # ← Adiciona resposta ao histórico
+            historico.append({"role": "assistant", "content": resposta})
+            
+            # Salva no banco
+            msg_usuario = MensagemChat(
+                usuario="Rondinelle", 
+                mensagem=entrada_usuario, 
+                origem="usuario", 
+                data_hora=datetime.now(), model=model)
+            chat_repository.salvar_mensagem(msg_usuario)
+            
+            msg_bot = MensagemChat(
+                usuario="Assistente", 
+                mensagem=resposta, 
+                origem="bot", 
+                data_hora=datetime.now(), 
                 model=model
             )
-            chat_repository.salvar_mensagem(mensagem_usuario)
+            chat_repository.salvar_mensagem(msg_bot)
             
-            # Obter resposta da IA
-            resposta = service_ativo.gerar_resposta(entrada_usuario, model=model, temperature=1.0)
-            
-            # Salvar resposta da IA
-            mensagem_bot = MensagemChat(
-                usuario="Assistente",
-                mensagem=resposta,
-                origem="bot",
-                data_hora=datetime.now(),
-                model=model
-            )
-            chat_repository.salvar_mensagem(mensagem_bot)
+            print(f"Bot: {resposta}\n")
                
     finally:
         db.close()
-
 if __name__ == "__main__":
     inicializar_ambiente()
     main()
