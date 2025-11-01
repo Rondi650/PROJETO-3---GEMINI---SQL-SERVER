@@ -1,7 +1,7 @@
 from ollama import chat
 
 class OllamaService:
-    def gerar_resposta(self, pergunta: str, model: str) -> str:
+    def gerar_resposta(self, pergunta: str, model: str, temperature: float = 1.0) -> str:
         try:
             messages = [
                 {
@@ -12,7 +12,7 @@ class OllamaService:
             stream = chat(
             model=model,
             messages=[*messages, {'role': 'user', 'content': pergunta}],
-            options={'temperature': 0.5},
+            options={'temperature': 1.0},
             stream=True
             )
 
@@ -20,6 +20,7 @@ class OllamaService:
             resposta = ''
             for part in stream:
                 resposta += part['message']['content']
+                print(part['message']['content'], end='', flush=True)
             return resposta
         except Exception as e:
             print(f"Erro ao consultar Ollama: {e}")

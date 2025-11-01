@@ -13,13 +13,7 @@ ollama = OllamaService()
 openai = OpenAIService()
 chat_repo = ChatRepository(db)
 
-def responder(mensagem: str,history: list[dict[str, str]],system_message: str,servico: str,modelo: str, temperature: float=0.5):
-    print("Mensagem recebida:", mensagem)
-    print("Serviço selecionado:", servico)
-    print("Modelo selecionado:", modelo)
-    print("System message:", system_message)
-    print("Histórico de mensagens:", history)
-    print("Iniciando resposta...\n")
+def responder(mensagem: str,history: list[dict[str, str]],system_message: str,servico: str,modelo: str, temperature: float=1.0):
     try:
         messages = []
         if system_message:
@@ -27,25 +21,20 @@ def responder(mensagem: str,history: list[dict[str, str]],system_message: str,se
         if history:
             messages.extend(history)
         messages.append({"role": "user", "content": mensagem})
-        print("Mensagens para o modelo:", messages)
-        print()
         
         # Formata para texto (embutido)
         linhas = [f"{msg.get('role')}: {msg.get('content', '')}" for msg in messages]
         prompt = "\n".join(linhas)
         
         if servico == "Gemini":
-            resposta_completa = gemini.gerar_resposta(prompt, model=modelo)
+            resposta_completa = gemini.gerar_resposta(prompt, model=modelo, temperature=temperature)
         elif servico == "OpenAI":
-            resposta_completa = openai.gerar_resposta(prompt, model=modelo)
+            resposta_completa = openai.gerar_resposta(prompt, model=modelo, temperature=temperature)
         else:
-            resposta_completa = ollama.gerar_resposta(prompt, model=modelo)
-        print("Resposta do modelo:", resposta_completa)
+            resposta_completa = ollama.gerar_resposta(prompt, model=modelo, temperature=temperature)
+
+        yield resposta_completa
         
-        # Streaming com chunks maiores (preserva espaçamento)
-        for i in range(0, len(resposta_completa), 50):
-            yield resposta_completa[:i + 50]
-            
         msg_user = MensagemChat(
             usuario="Usuario",
             mensagem=mensagem,
@@ -84,7 +73,7 @@ chatbot = gr.ChatInterface(
         gr.Textbox(value="Voce e meu assistente pessoal virtual.", label="System message"),
         gr.Radio(["Gemini", "Ollama", "OpenAI"], value="OpenAI", label="Serviço"),
         gr.Dropdown(choices=modelos_lista, label="Modelo", value="gpt-5-mini-2025-08-07"),
-        gr.Slider(minimum=0, maximum=1, value=0.5, label="Temperature")
+        gr.Slider(minimum=0, maximum=2, value=1.0, label="Temperature")
     ],
     textbox=gr.Textbox(
         placeholder="Digite sua mensagem aqui...",

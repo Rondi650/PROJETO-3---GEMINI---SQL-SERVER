@@ -9,17 +9,18 @@ class GeminiService:
         self.api_key = os.getenv('GEMINI_KEY')
         self.client = genai.Client(api_key=self.api_key)
         
-    def gerar_resposta(self, pergunta: str, model: str) -> str:
+    def gerar_resposta(self, pergunta: str, model: str, temperature: float = 1.0) -> str:
         try:
             response = self.client.models.generate_content(
                 model=model,
                 contents=pergunta,
                 config=types.GenerateContentConfig(
                     system_instruction="Voce e meu assistente virtual",
-                    temperature=0.5
+                    temperature=1.0,
                 ),
             )
             texto = response.text if response.text is not None else "Sem resposta da API."
+            print(texto)
             return texto
         
         except Exception as e:

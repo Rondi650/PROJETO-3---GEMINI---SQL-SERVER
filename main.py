@@ -2,6 +2,7 @@ import os
 from app.core.database import SessionLocal, engine
 from app.services.gemini_service import GeminiService
 from app.services.ollama_service import OllamaService
+from app.services.openai_service import OpenAIService
 from app.repositories.chat_repository import ChatRepository
 from app.schemas.chat import MensagemChat
 from app.models.chat import Base
@@ -19,6 +20,7 @@ def main():
         # Instancia os serviços
         gemini_service = GeminiService()
         ollama_service = OllamaService()
+        openai_service = OpenAIService()
         chat_repository = ChatRepository(db)
         
         # Loop principal
@@ -27,8 +29,8 @@ def main():
             entrada_usuario = input('Chat: ')
             
             '''CONFIGURACOES'''
-            model = "gemini-2.5-pro" 
-            service_ativo = gemini_service
+            model = "gpt-5-nano-2025-08-07" 
+            service_ativo = openai_service
             
             # Encerra a conversa
             if entrada_usuario.lower() in ['sair', 'exit', 'quit', 'bye', 'fim', 'terminate', 'end', 'close']:
@@ -46,7 +48,7 @@ def main():
             chat_repository.salvar_mensagem(mensagem_usuario)
             
             # Obter resposta da IA
-            resposta = service_ativo.gerar_resposta(entrada_usuario, model=model)
+            resposta = service_ativo.gerar_resposta(entrada_usuario, model=model, temperature=1.0)
             
             # Salvar resposta da IA
             mensagem_bot = MensagemChat(

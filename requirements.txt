@@ -1,7 +1,14 @@
-google-genai>=0.8.0
-ollama>=0.3.0
-sqlalchemy>=2.0.0
-pydantic>=2.0.0
-pyodbc>=5.0.0
-python-dotenv>=1.0.0
-gradio>=4.0.0
+# Core
+python-dotenv==1.0.0
+sqlalchemy==2.0.23
+
+# APIs de IA
+google-generativeai==0.3.0
+openai==1.3.0
+ollama==0.1.0
+
+# Web Framework
+gradio==4.20.0
+
+# Utilities
+requests==2.31.0
