@@ -1,5 +1,6 @@
 import os
 from app.core.database import SessionLocal, engine
+from app.utils.prompt_builder import formatar_historico
 from app.services.gemini_service import GeminiService
 from app.services.ollama_service import OllamaService
 from app.services.openai_service import OpenAIService
@@ -43,10 +44,7 @@ def main():
             })
 
             # Formata histórico em texto para enviar ao modelo
-            lista = []
-            for msg in historico:
-                lista.append(f"{msg['role']}: {msg['content']}")
-            prompt = "\n".join(lista)
+            prompt = formatar_historico(historico)
 
             # Obtém resposta do modelo de IA
             resposta = service_ativo.gerar_resposta(

@@ -1,6 +1,7 @@
 import gradio as gr
 from datetime import datetime
 from app.core.database import SessionLocal
+from app.utils.prompt_builder import formatar_historico
 from app.services.gemini_service import GeminiService
 from app.services.ollama_service import OllamaService
 from app.services.openai_service import OpenAIService
@@ -44,10 +45,7 @@ def responder(mensagem: str,
         messages.append({"role": "user", "content": mensagem})
         
         # Formata mensagens em texto para envio ao modelo
-        lista = []
-        for msg in messages:
-            lista.append(f"{msg['role']}: {msg['content']}")
-        prompt = "\n".join(lista)
+        prompt = formatar_historico(messages)
         
         # Seleciona serviço de IA e obtém resposta
         if servico == "Gemini":
