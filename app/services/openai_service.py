@@ -1,16 +1,13 @@
 from openai import OpenAI
-import os
-from dotenv import load_dotenv
+from app.core.config import OPENAI_API_KEY
 
 class OpenAIService:
     """Serviço de integração com a API da OpenAI para geração de respostas."""
     
     def __init__(self):
         """Inicializa o cliente OpenAI com a chave de API do ambiente."""
-        load_dotenv()
-        self.api_key = os.getenv('OPENAI_API_KEY')
-        self.client = OpenAI(api_key=self.api_key)
-        
+        self.client = OpenAI(api_key=OPENAI_API_KEY)
+
     def gerar_resposta(self, pergunta: str, model: str, temperature: float = 1.0) -> str:
         """
         Gera uma resposta usando o modelo OpenAI especificado.

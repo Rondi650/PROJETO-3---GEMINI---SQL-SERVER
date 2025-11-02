@@ -1,16 +1,13 @@
 from google import genai
 from google.genai import types
-import os
-from dotenv import load_dotenv
+from app.core.config import GEMINI_KEY
 
 class GeminiService:
     """Serviço para comunicação com a API Gemini (Google)."""
     
     def __init__(self):
         """Inicializa o cliente Gemini com a chave de API do ambiente."""
-        load_dotenv()
-        self.api_key = os.getenv('GEMINI_KEY')
-        self.client = genai.Client(api_key=self.api_key)
+        self.client = genai.Client(api_key=GEMINI_KEY)
         
     def gerar_resposta(self, pergunta: str, model: str, temperature: float = 1.0) -> str:
         """

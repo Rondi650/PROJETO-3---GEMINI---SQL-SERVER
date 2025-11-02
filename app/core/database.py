@@ -1,12 +1,12 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.engine import URL
+from app.core.config import DATABASE_URL
  
 # Crie a URL de conexão
-connection_string = "DRIVER={ODBC Driver 17 for SQL Server};SERVER=localhost;DATABASE=IA;Trusted_Connection=yes;"
 connection_url = URL.create(
     "mssql+pyodbc",
-    query={"odbc_connect": connection_string}
+    query={"odbc_connect": DATABASE_URL}
 )
  
 # Cria o engine (motor de conexão com SQL Server)
