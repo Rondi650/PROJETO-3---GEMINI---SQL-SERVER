@@ -3,9 +3,12 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from datetime import datetime
  
 class Base(DeclarativeBase):
+    """Base para todos os modelos SQLAlchemy."""
     pass
  
 class HistoricoChat(Base):
+    """Modelo para armazenar histórico de mensagens de chat."""
+    
     __tablename__ = 'HistoricoChat'
     
     id: Mapped[int] = mapped_column(primary_key=True, index=True, autoincrement=True)

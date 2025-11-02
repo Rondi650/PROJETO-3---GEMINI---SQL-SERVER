@@ -4,6 +4,7 @@ from datetime import datetime
  
 class MensagemChat(BaseModel):
     model_config = ConfigDict(from_attributes=True)
+    """Schema de validação para mensagens de chat."""
     
     usuario: Annotated[str, Field(max_length=100)]
     mensagem: str
