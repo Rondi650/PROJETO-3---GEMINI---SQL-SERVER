@@ -1,0 +1,95 @@
+  # ==================== BANCO DE DADOS ====================
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: chat-sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=SenhaForte@123
+      - MSSQL_PID=Developer
+      - MSSQL_COLLATION=Latin1_General_CI_AS
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    networks:
+      - chat-network
+    healthcheck:
+      # Checa se a porta 1433 está aceitando conexões (sem sqlcmd)
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/127.0.0.1/1433'"]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 90s
+
+  db-init:
+    image: mcr.microsoft.com/mssql-tools:latest
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    entrypoint: ["/bin/bash","-lc"]
+    command: >
+      "/opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P 'SenhaForte@123' -Q
+      \"IF DB_ID('IA') IS NULL CREATE DATABASE IA;\" -C"
+    networks:
+      - chat-network
+    restart: "no"
+
+  # ==================== CHAT GRADIO (Normal) ====================
+  chat-gradio:
+    build: .
+    container_name: chat-gradio
+    command: python chat_gradio.py
+    ports:
+      - "7860:7860"
+    environment:
+      - GRADIO_PORT=7860
+      - GEMINI_KEY=${GEMINI_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - DATABASE_URL=mssql+pyodbc://sa:SenhaForte@123@sqlserver:1433/IA?driver=ODBC+Driver+18+for+SQL+Server&TrustServerCertificate=yes&Encrypt=no
+    volumes:
+      - ./app:/app/app
+      - ./uploads:/app/uploads
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      db-init:
+        condition: service_completed_successfully
+    networks:
+      - chat-network
+    restart: unless-stopped
+
+  # ==================== CHAT RAG ====================
+  chat-rag:
+    build: .
+    container_name: chat-rag
+    command: python chat_RAG.py
+    ports:
+      - "7861:7861"
+    environment:
+      - GRADIO_PORT=7861
+      - GEMINI_KEY=${GEMINI_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - DATABASE_URL=mssql+pyodbc://sa:SenhaForte@123@sqlserver:1433/IA?driver=ODBC+Driver+18+for+SQL+Server&TrustServerCertificate=yes&Encrypt=no
+    volumes:
+      - ./app:/app/app
+      - ./uploads:/app/uploads
+      - ./app/documents:/app/app/documents
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      db-init:
+        condition: service_completed_successfully
+    networks:
+      - chat-network
+    restart: unless-stopped
+
+# ==================== VOLUMES ====================
+volumes:
+  sqlserver_data:
+    driver: local
+
+# ==================== NETWORKS ====================
+networks:
+  chat-network:
+    driver: bridge

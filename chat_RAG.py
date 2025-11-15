@@ -113,6 +113,7 @@ with gr.Blocks(title="Chat IA com RAG", theme=gr.themes.Soft()) as interface:
                 chatbot=gr.Chatbot(
                     height="70vh",
                     label="Chat",
+                    type="messages",  # ← ADICIONAR ESTA LINHA
                     container=True,
                 ),
                 additional_inputs=[
