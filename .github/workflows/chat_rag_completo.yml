@@ -19,10 +19,10 @@ jobs:
 
         steps:
         - name: Checkout repository
-          uses: actions/checkout@v2
+          uses: actions/checkout@v4
 
         - name: Set up Python
-          uses: actions/setup-python@v2
+          uses: actions/setup-python@v5
           with:
             python-version: '3.13.5'
 
@@ -33,18 +33,17 @@ jobs:
             pip install pytest pytest-cov
 
         - name: Run tests with coverage
-          run: |
-            pytest app/test/ --cov=app --cov-report=xml
+        shell: bash
+        run: |
+            pytest -v --maxfail=1 --tb=short \
+            --cov=app --cov-report=term-missing \
+            --cov-report=xml:coverage.xml \
+            --cov-report=html
 
-        # - name: Upload coverage reports to Codecov
-        #   uses: codecov/codecov-action@v5
-        #   with:
-        #     token: ${{ secrets.CODECOV_TOKEN }}
-
-        # - name: Upload coverage to Codecov
-        #   uses: codecov/codecov-action@v2
-        #   with:
-        #     files: ./coverage.xml
-        #     flags: unittests
-        #     name: codecov-umbrella
-        #     fail_ci_if_error: true
+        - name: Upload coverage artifact
+          uses: actions/upload-artifact@v4
+          with:
+            name: coverage
+            path: |
+              coverage.xml
+              htmlcov/**
