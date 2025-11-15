@@ -12,11 +12,20 @@ db = SessionLocal()
 rag_service = RAGService()
 chat_repo = ChatRepository(db)
 
+# Lista de modelos disponíveis
+MODELOS_OPENAI = [
+    "gpt-5-2025-08-07",
+    "gpt-5-mini-2025-08-07",
+    "gpt-5-nano-2025-08-07",
+    "gpt-5.1-2025-11-13",
+    "gpt-4.1-2025-04-14"
+]
 
 def responder(
     mensagem: str,
     history: list[dict[str, str]],
-    arquivo_pdf = None         # gr.File -> tempfile
+    arquivo = None,    
+    modelo: str = "gpt-5-nano-2025-08-07"
 ):
     """
     Processa mensagem do usuário, obtém resposta do modelo de IA (normal ou RAG)
@@ -25,10 +34,10 @@ def responder(
     try:
 
         # Carrega o PDF uma única vez, quando vier arquivo novo
-        if arquivo_pdf is not None:
-            rag_service.carregar_pdf(arquivo_pdf.name)
+        if arquivo is not None:
+            rag_service.carregar_documento(arquivo.name)
 
-        resposta_completa = rag_service.rag(mensagem)
+        resposta_completa = rag_service.rag(mensagem, model=modelo)
 
         # Monta lista de mensagens com contexto completo (modo padrão)
         messages = []
@@ -45,7 +54,7 @@ def responder(
             mensagem=mensagem,
             origem="usuario",
             data_hora=datetime.now(),
-            model="gpt-5-nano-2025-08-07" # Nome explicito apenas para o RAG
+            model=modelo # Nome explicito apenas para o RAG
         )
         chat_repo.salvar_mensagem(msg_user)
 
@@ -55,7 +64,7 @@ def responder(
             mensagem=resposta_completa,
             origem="bot",
             data_hora=datetime.now(),
-            model="gpt-5-nano-2025-08-07" # Nome explicito apenas para o RAG
+            model=modelo # Nome explicito apenas para o RAG
         )
         chat_repo.salvar_mensagem(msg_bot)
 
@@ -64,27 +73,61 @@ def responder(
 
 # Interface web com Gradio
 with gr.Blocks(title="Chat IA com RAG", theme=gr.themes.Soft()) as interface:
-    gr.Markdown("## 🤖 Rondi`s RAG")
-    gr.Markdown("Chat com modelo de linguagem integrado a documentos PDF via RAG (Retrieval-Augmented Generation).")
-    gr.Markdown("Carregue um PDF e faça perguntas baseadas no conteúdo do documento.")
-
+    gr.Markdown("## 🤖 Rondi's RAG")
+    gr.Markdown("Chat com modelo de linguagem integrado a documentos PDF via RAG.")
+    
     with gr.Row():
+        # Sidebar com configurações
+        with gr.Column(scale=1, min_width=300):
+            gr.Markdown("### ⚙️ Configurações")
+            
+            modelo_dropdown = gr.Dropdown(
+                choices=MODELOS_OPENAI,
+                value="gpt-5-nano-2025-08-07",
+                label="Modelo OpenAI",
+                info="Escolha o modelo de linguagem"
+            )
+            
+            arquivo_upload = gr.File(
+                label="📄 Upload PDF ou TXT",
+                file_types=[".pdf", ".txt"],
+                interactive=True
+            )
+            
+            gr.Markdown("---")
+            gr.Markdown(
+                "**Dica:** Carregue um PDF ou TXT antes de fazer perguntas.\n\n"
+                "Modelos recomendados:\n"
+                "- **gpt-5**: Mais completo e detalhado\n"
+                "- **gpt-5-mini**: Rápido e objetivo\n"
+                "- **gpt-5-nano**: Rápido e básico\n"
+                "- **gpt-5.1**: Melhor para conversas longas\n"
+                "- **gpt-4.1**: Eficiente e preciso\n" 
+            )
+        
+        # Área principal do chat
         with gr.Column(scale=3):
             chatbot = gr.ChatInterface(
                 fn=responder,
                 type="messages",
+                chatbot=gr.Chatbot(
+                    height="70vh",
+                    label="Chat",
+                    container=True,
+                ),
                 additional_inputs=[
-                    gr.File(
-                        label="PDF para RAG",
-                        file_types=[".pdf"],
-                        interactive=True
-                    ),
+                    arquivo_upload,
+                    modelo_dropdown
                 ],
                 textbox=gr.Textbox(
-                    placeholder="Digite sua mensagem aqui...",
-                    label="Sua mensagem",
-                    max_lines=5
-                )
+                    placeholder="Digite sua pergunta sobre o documento...",
+                    label="Sua mensagem"
+                ),
+                examples=[
+                    ["Faça um resumo do documento"],
+                    ["Quais são os principais tópicos abordados?"],
+                    ["Explique a seção sobre..."],
+                ]
             )
 
 if __name__ == "__main__":
