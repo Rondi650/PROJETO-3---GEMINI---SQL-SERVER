@@ -1,96 +1,95 @@
 # 🤖 Rondi's BOT
 
-Um assistente de IA conversacional que integra múltiplos modelos de linguagem (Gemini, OpenAI, Ollama) com interface web interativa e persistência de histórico em banco de dados SQL Server.
+Um assistente de IA conversacional que integra múltiplos modelos (Gemini, OpenAI, Ollama) com interface web, modo RAG (documentos) e histórico em SQL Server.
 
 ## 📋 Status
-
-🚧 **Em Desenvolvimento** - Funcionalidades de RAG (Retrieval-Augmented Generation) em progresso.
+🚧 Em desenvolvimento – RAG, Docker e ajustes de conexão em evolução.
 
 ## ✨ Funcionalidades
-
-- 💬 Chat em tempo real com suporte a streaming
-- 🔄 Histórico de conversas persistente (SQL Server)
-- 🤖 Suporte a múltiplos modelos de IA:
-  - **Gemini** (Google)
-  - **OpenAI** (GPT)
-  - **Ollama** (Local)
-- ⚙️ Controle de temperatura e system messages
-- 🎨 Interface web com Gradio
+- 💬 Chat em tempo real (streaming) com Gradio
+- 🔎 RAG: perguntas sobre PDFs/TXTs (upload e contexto)
+- 🗂️ Histórico persistente (SQL Server)
+- 🤖 Múltiplos provedores: Gemini, OpenAI, Ollama
+- ⚙️ System message, temperature e seleção de modelos
+- 🖥️ Modo Terminal (CLI)
 
 ## 🚀 Início Rápido
 
-### Pré-requisitos
+### Pré‑requisitos
 - Python 3.10+
-- SQL Server
+- SQL Server (local ou via Docker)
 - Chaves de API (Gemini, OpenAI)
 
 ### Instalação
-
 ```bash
-# Clone o repositório
 git clone https://github.com/seu-usuario/PROJETO-3-GEMINI-SQL-SERVER.git
 cd "PROJETO 3 - GEMINI + SQL SERVER"
 
-# Crie um ambiente virtual
 python -m venv venv
 venv\Scripts\activate  # Windows
-source venv/bin/activate  # Linux/Mac
+# source venv/bin/activate  # Linux/Mac
 
-# Instale as dependências
 pip install -r requirements.txt
 ```
 
 ### Configuração
-
-1. Crie um arquivo `.env` na raiz do projeto:
+Crie um arquivo .env na raiz:
 ```env
-GEMINI_KEY=sua_chave_aqui
-OPENAI_API_KEY=sua_chave_aqui
-DATABASE_URL=mssql+pyodbc://user:password@servidor/banco
-```
-
-2. Execute as migrações:
-```bash
-python main.py
+GEMINI_KEY=SuaChaveAqui
+OPENAI_API_KEY=SuaChaveAqui
+# Exemplo de URL (SQLAlchemy + pyodbc):
+DATABASE_URL=mssql+pyodbc://sa:SenhaForte@123@localhost:1433/IA?driver=ODBC+Driver+18+for+SQL+Server&TrustServerCertificate=yes&Encrypt=no
 ```
 
 ## 💻 Como Usar
 
-### Interface Web (Gradio)
+### 1) Interface Web (chat padrão)
 ```bash
-python app_chat.py
+python chat_gradio.py
+# Acesse: http://localhost:7860
 ```
-Acesse `http://localhost:7860` no navegador.
 
-### Terminal
+### 2) Interface Web (RAG – documentos)
 ```bash
-python main.py
+python chat_RAG.py
+# Acesse: http://localhost:7861
+```
+
+### 3) Terminal (CLI)
+```bash
+python chat_terminal.py
+```
+
+### (Opcional) Via Docker
+```bash
+docker-compose up -d
+# Web: http://localhost:7860 (chat)
+# RAG: http://localhost:7861 (documentos)
 ```
 
 ## 📁 Estrutura do Projeto
-
 ```
 app/
-├── core/           # Configurações de banco de dados
+├── core/           # Config e conexão com banco
 ├── models/         # Modelos SQLAlchemy
-├── repositories/   # Acesso a dados
+├── repositories/   # Repositórios de dados
 ├── schemas/        # Schemas de validação
-├── services/       # Serviços de IA (Gemini, OpenAI, Ollama)
-app_chat.py         # Interface Gradio
-main.py             # Interface de linha de comando
+├── services/       # Serviços (Gemini, OpenAI, Ollama, RAG)
+└── test/           # Testes
+chat_gradio.py      # UI web (chat)
+chat_RAG.py         # UI web (RAG)
+chat_terminal.py    # Chat por terminal
+Dockerfile          # Build da app
+docker-compose.yml  # Orquestração (app + SQL Server)
 ```
 
 ## 🔜 Próximas Funcionalidades
+- Melhorias no RAG e no gerenciamento de documentos
+- Ajustes do Docker
 
-- ✅ RAG (Retrieval-Augmented Generation)
-- ✅ Upload de documentos
-- ✅ Busca semântica
-- ✅ Suporte a múltiplas conversas
 
 ## 👤 Autor
-
 Rondinelle
 
 ---
-
-**Nota:** Este projeto ainda está em desenvolvimento.q
+**Nota:** Projeto em evolução; quebras de compatibilidade podem ocorrer.
