@@ -2,9 +2,6 @@
 
 Um assistente de IA conversacional que integra múltiplos modelos (Gemini, OpenAI, Ollama) com interface web, modo RAG (documentos) e histórico em SQL Server.
 
-## 📋 Status
-🚧 Em desenvolvimento – RAG, Docker e ajustes de conexão em evolução.
-
 ## ✨ Funcionalidades
 - 💬 Chat em tempo real (streaming) com Gradio
 - 🔎 RAG: perguntas sobre PDFs/TXTs (upload e contexto)
@@ -82,11 +79,6 @@ chat_terminal.py    # Chat por terminal
 Dockerfile          # Build da app
 docker-compose.yml  # Orquestração (app + SQL Server)
 ```
-
-## 🔜 Próximas Funcionalidades
-- Melhorias no RAG e no gerenciamento de documentos
-- Ajustes do Docker
-
 
 ## 👤 Autor
 Rondinelle

@@ -5,12 +5,22 @@ load_dotenv()
 
 GEMINI_KEY = os.getenv('GEMINI_KEY')
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-DATABASE_URL = os.getenv('DATABASE_URL')
+LOCAL_SQLSERVER = os.getenv('LOCAL_SQLSERVER')
 
-# Validação
+# Não quebra se faltar em ambiente Docker (opcional: só avisa)
 if not GEMINI_KEY:
-    raise ValueError("⚠️ GEMINI_KEY não configurada no .env")
+    print("Aviso: GEMINI_KEY não definida.")
 if not OPENAI_API_KEY:
-    raise ValueError("⚠️ OPENAI_API_KEY não configurada no .env")
-if not DATABASE_URL:
-    raise ValueError("⚠️ DATABASE_URL não configurada no .env")
+    print("Aviso: OPENAI_API_KEY não definida.")
+
+# Estratégia:
+# 1. Se DATABASE_URL estiver presente (Docker), usa.
+# 2. Senão, tenta LOCAL_SQLSERVER_URL (ambiente local .env).
+# 3. Senão, fallback para sqlite local.
+DATABASE_URL = (
+    os.getenv("DATABASE_URL")
+    or os.getenv("LOCAL_SQLSERVER")
+    or "sqlite:///./data.db"
+)
+
+print(f"[CONFIG] Usando DATABASE_URL = {DATABASE_URL}")
