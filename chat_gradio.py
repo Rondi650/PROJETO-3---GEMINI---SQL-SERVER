@@ -26,40 +26,29 @@ def responder(
     system_message: str,
     servico: str,
     modelo: str,
-    temperature: float,
-    modo: str,           # "Padrão" ou "RAG (PDF + OpenAI)"
-    arquivo_pdf = None         # gr.File -> tempfile
+    temperature: float
 ):
     """
     Processa mensagem do usuário, obtém resposta do modelo de IA (normal ou RAG)
     e persiste no banco.
     """
     try:
-        # Se modo RAG, ignoramos Gemini/Ollama e usamos somente OpenAI + PDF
-        if modo == "RAG (PDF + OpenAI)":
-            # Carrega o PDF uma única vez, quando vier arquivo novo
-            if arquivo_pdf is not None:
-                rag_service.carregar_pdf(arquivo_pdf.name)
+        # Monta lista de mensagens com contexto completo (modo padrão)
+        messages = []
+        if system_message:
+            messages.append({"role": "system", "content": system_message})
+        if history:
+            messages.extend(history)
+        messages.append({"role": "user", "content": mensagem})
 
-            resposta_completa = rag_service.rag(mensagem)
+        prompt = formatar_historico(messages)
 
+        if servico == "Gemini":
+            resposta_completa = gemini.gerar_resposta(prompt, model=modelo, temperature=temperature)
+        elif servico == "OpenAI":
+            resposta_completa = openai.gerar_resposta(prompt, model=modelo, temperature=temperature)
         else:
-            # Monta lista de mensagens com contexto completo (modo padrão)
-            messages = []
-            if system_message:
-                messages.append({"role": "system", "content": system_message})
-            if history:
-                messages.extend(history)
-            messages.append({"role": "user", "content": mensagem})
-
-            prompt = formatar_historico(messages)
-
-            if servico == "Gemini":
-                resposta_completa = gemini.gerar_resposta(prompt, model=modelo, temperature=temperature)
-            elif servico == "OpenAI":
-                resposta_completa = openai.gerar_resposta(prompt, model=modelo, temperature=temperature)
-            else:
-                resposta_completa = ollama.gerar_resposta(prompt, model=modelo, temperature=temperature)
+            resposta_completa = ollama.gerar_resposta(prompt, model=modelo, temperature=temperature)
 
         # Envia resposta ao frontend
         yield resposta_completa
@@ -94,7 +83,8 @@ modelos_lista = [
     "gemini-2.5-flash-lite",
     "gemini-2.0-flash-lite",
     "gpt-5-nano-2025-08-07",
-    "gpt-5-mini-2025-08-07"
+    "gpt-5-mini-2025-08-07",
+    "gpt-5-2025-08-07"
 ]
 
 # Interface web com Gradio
@@ -126,17 +116,7 @@ with gr.Blocks(title="Chat IA", theme=gr.themes.Soft()) as interface:
                         maximum=2,
                         value=1.0,
                         label="Temperature"
-                    ),
-                    gr.Radio(
-                        ["Padrão", "RAG (PDF + OpenAI)"],
-                        value="Padrão",
-                        label="Modo de resposta"
-                    ),
-                    gr.File(
-                        label="PDF para RAG",
-                        file_types=[".pdf"],
-                        interactive=True
-                    ),
+                    )
                 ],
                 textbox=gr.Textbox(
                     placeholder="Digite sua mensagem aqui...",

@@ -3,19 +3,12 @@ import gradio as gr
 from datetime import datetime
 
 from app.core.database import SessionLocal
-from app.utils.prompt_builder import formatar_historico
-from app.services.gemini_service import GeminiService
-from app.services.ollama_service import OllamaService
-from app.services.openai_service import OpenAIService
 from app.services.rag_services import RAGService
 from app.repositories.chat_repository import ChatRepository
 from app.schemas.chat import MensagemChat
 
 # Inicializa dependências
 db = SessionLocal()
-gemini = GeminiService()
-ollama = OllamaService()
-openai = OpenAIService()
 rag_service = RAGService()
 chat_repo = ChatRepository(db)
 
@@ -23,11 +16,6 @@ chat_repo = ChatRepository(db)
 def responder(
     mensagem: str,
     history: list[dict[str, str]],
-    system_message: str,
-    servico: str,
-    modelo: str,
-    temperature: float,
-    modo: str,           # "Padrão" ou "RAG (PDF + OpenAI)"
     arquivo_pdf = None         # gr.File -> tempfile
 ):
     """
@@ -35,31 +23,18 @@ def responder(
     e persiste no banco.
     """
     try:
-        # Se modo RAG, ignoramos Gemini/Ollama e usamos somente OpenAI + PDF
-        if modo == "RAG (PDF + OpenAI)":
-            # Carrega o PDF uma única vez, quando vier arquivo novo
-            if arquivo_pdf is not None:
-                rag_service.carregar_pdf(arquivo_pdf.name)
 
-            resposta_completa = rag_service.rag(mensagem)
+        # Carrega o PDF uma única vez, quando vier arquivo novo
+        if arquivo_pdf is not None:
+            rag_service.carregar_pdf(arquivo_pdf.name)
 
-        else:
-            # Monta lista de mensagens com contexto completo (modo padrão)
-            messages = []
-            if system_message:
-                messages.append({"role": "system", "content": system_message})
-            if history:
-                messages.extend(history)
-            messages.append({"role": "user", "content": mensagem})
+        resposta_completa = rag_service.rag(mensagem)
 
-            prompt = formatar_historico(messages)
-
-            if servico == "Gemini":
-                resposta_completa = gemini.gerar_resposta(prompt, model=modelo, temperature=temperature)
-            elif servico == "OpenAI":
-                resposta_completa = openai.gerar_resposta(prompt, model=modelo, temperature=temperature)
-            else:
-                resposta_completa = ollama.gerar_resposta(prompt, model=modelo, temperature=temperature)
+        # Monta lista de mensagens com contexto completo (modo padrão)
+        messages = []
+        if history:
+            messages.extend(history)
+        messages.append({"role": "user", "content": mensagem})
 
         # Envia resposta ao frontend
         yield resposta_completa
@@ -70,7 +45,7 @@ def responder(
             mensagem=mensagem,
             origem="usuario",
             data_hora=datetime.now(),
-            model=modelo,
+            model="gpt-5-nano-2025-08-07" # Nome explicito apenas para o RAG
         )
         chat_repo.salvar_mensagem(msg_user)
 
@@ -80,26 +55,18 @@ def responder(
             mensagem=resposta_completa,
             origem="bot",
             data_hora=datetime.now(),
-            model=modelo,
+            model="gpt-5-nano-2025-08-07" # Nome explicito apenas para o RAG
         )
         chat_repo.salvar_mensagem(msg_bot)
 
     except Exception as e:
         yield f"❌ Erro: {e}"
 
-
-# Lista de modelos disponíveis (modo padrão)
-modelos_lista = [
-    "gemma3:4b",
-    "gemini-2.5-flash-lite",
-    "gemini-2.0-flash-lite",
-    "gpt-5-nano-2025-08-07",
-    "gpt-5-mini-2025-08-07"
-]
-
 # Interface web com Gradio
-with gr.Blocks(title="Chat IA", theme=gr.themes.Soft()) as interface:
-    gr.Markdown("## 🤖 Rondi`s BOT")
+with gr.Blocks(title="Chat IA com RAG", theme=gr.themes.Soft()) as interface:
+    gr.Markdown("## 🤖 Rondi`s RAG")
+    gr.Markdown("Chat com modelo de linguagem integrado a documentos PDF via RAG (Retrieval-Augmented Generation).")
+    gr.Markdown("Carregue um PDF e faça perguntas baseadas no conteúdo do documento.")
 
     with gr.Row():
         with gr.Column(scale=3):
@@ -107,31 +74,6 @@ with gr.Blocks(title="Chat IA", theme=gr.themes.Soft()) as interface:
                 fn=responder,
                 type="messages",
                 additional_inputs=[
-                    gr.Textbox(
-                        value="Voce e meu assistente pessoal virtual.",
-                        label="System message"
-                    ),
-                    gr.Radio(
-                        ["Gemini", "Ollama", "OpenAI"],
-                        value="OpenAI",
-                        label="Serviço"
-                    ),
-                    gr.Dropdown(
-                        choices=modelos_lista,
-                        label="Modelo",
-                        value="gpt-5-mini-2025-08-07"
-                    ),
-                    gr.Slider(
-                        minimum=0,
-                        maximum=2,
-                        value=1.0,
-                        label="Temperature"
-                    ),
-                    gr.Radio(
-                        ["Padrão", "RAG (PDF + OpenAI)"],
-                        value="Padrão",
-                        label="Modo de resposta"
-                    ),
                     gr.File(
                         label="PDF para RAG",
                         file_types=[".pdf"],
@@ -146,4 +88,4 @@ with gr.Blocks(title="Chat IA", theme=gr.themes.Soft()) as interface:
             )
 
 if __name__ == "__main__":
-    interface.launch(server_port=7860, show_error=True, share=True)
+    interface.launch(server_port=7861, show_error=True, share=True)

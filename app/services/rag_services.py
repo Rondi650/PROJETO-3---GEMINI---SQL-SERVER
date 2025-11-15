@@ -43,12 +43,12 @@ class RAGService:
             ),
         ])
 
-        modelo = ChatOpenAI(model="gpt-4o-mini", temperature=0.2)
-        print("Modelo de linguagem inicializado.")
+        modelo = ChatOpenAI(model="gpt-5-nano-2025-08-07", temperature=0.2)
+        print("\nModelo de linguagem inicializado.")
         return prompt | modelo | StrOutputParser()
 
     def carregar_pdf(self, caminho_pdf: str, encoding: str = "utf-8"):
-        print("Carregando PDF:", caminho_pdf)
+        print("\nCarregando PDF:", caminho_pdf)
         """
         Carrega um arquivo .pdf, gera chunks e inicializa o retriever com FAISS.
 
@@ -65,11 +65,11 @@ class RAGService:
             chunk_overlap=200,
         )
         pedacos = splitter.split_documents(documento)
-        print(f"Documento dividido em {len(pedacos)} pedaços.")
+        print(f"\nDocumento dividido em {len(pedacos)} pedaços.")
 
         # 4. Embeddings + FAISS
         embeddings_model = OpenAIEmbeddings(model="text-embedding-3-small")
-        print("Gerando embeddings e criando vectorstore FAISS...")
+        print("\nGerando embeddings e criando vectorstore FAISS...")
         vectorstore = FAISS.from_documents(
             documents=pedacos,
             embedding=embeddings_model,
@@ -77,7 +77,7 @@ class RAGService:
 
         # Cria retriever (k=2 trechos mais relevantes)
         self._retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
-        print("Retriever inicializado com sucesso.")
+        print("\nRetriever inicializado com sucesso.")
 
     def rag(self, pergunta: str) -> str:
         """
@@ -96,7 +96,7 @@ class RAGService:
         trechos = self._retriever.invoke(pergunta)
         contexto = "\n\n".join(um_trecho.page_content for um_trecho in trechos)
         for i, trecho in enumerate(trechos):
-            print(f'Trecho encontrado {i}: {trecho.page_content}')
+            print(f'\nTrecho encontrado {i+1}: {trecho.page_content}')
             print('-'*50)
 
         # 8. Gerar resposta
