@@ -180,4 +180,5 @@ pyrightconfig.json
 .gradio/temp/
 .gradio
 
-.data
+.data/
+data/

@@ -18,7 +18,8 @@ if not OPENAI_API_KEY:
 # 2. Senão, tenta LOCAL_SQLSERVER_URL (ambiente local .env).
 # 3. Senão, fallback para sqlite local.
 DATABASE_URL = (
-    LOCAL_SQLSERVER
+    os.getenv("DATABASE_URL")
+    or os.getenv("LOCAL_SQLSERVER")
     or "sqlite:///./data.db"
 )
 
