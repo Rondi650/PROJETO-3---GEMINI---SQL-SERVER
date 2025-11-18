@@ -98,8 +98,9 @@ with gr.Blocks(title="Chat IA", theme=gr.themes.Soft()) as interface:
                 type="messages",
                 additional_inputs=[
                     gr.Textbox(
-                        value="Voce e meu assistente pessoal virtual.",
-                        label="System message"
+                        value="",
+                        label="System message",
+                        placeholder="Instruções para o assistente",
                     ),
                     gr.Radio(
                         ["Gemini", "Ollama", "OpenAI"],
