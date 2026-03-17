@@ -50,12 +50,12 @@ def responder(
         chat_repo.salvar_mensagem(msg_bot)
 
     except Exception as e:
-        yield f"❌ Erro: {e}"
+        yield f"Erro: {e}"
 
 
 # Interface web com Gradio
-with gr.Blocks(title="Chat IA", theme=gr.themes.Soft()) as interface:
-    gr.Markdown("## 🤖 Rondi`s BOT - RAG")
+with gr.Blocks(title="Chat IA", theme=gr.themes.Citrus()) as interface:
+    gr.Markdown("## Rondi`s BOT - RAG")
 
     with gr.Row():
         with gr.Column(scale=3):
