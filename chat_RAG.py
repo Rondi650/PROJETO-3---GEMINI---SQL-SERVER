@@ -1,17 +1,13 @@
-# filepath: c:\Users\rondi\Desktop\PROGRAMACAO\PROJETOS PESSOAIS\PROJETO 3 - GEMINI + SQL SERVER\app_chat.py
 import gradio as gr
 from datetime import datetime
 
 from app.core.database import create_table
-from app.utils.prompt_builder import formatar_historico
-from app.services.openai_service import OpenAIService
 from app.services.rag_services import RAGService
 from app.repositories.chat_repository import ChatRepository
 from app.schemas.chat import MensagemChat
 
 # Inicializa dependências
 create_table()
-openai = OpenAIService()
 rag_service = RAGService()
 chat_repo = ChatRepository()
 
@@ -30,11 +26,8 @@ def responder(
     e persiste no banco.
     """
     try:
-        # Se modo RAG, ignoramos Gemini/Ollama e usamos somente OpenAI + PDF
-        if modo == "RAG (PDF + OpenAI)":
-            # Carrega o PDF uma única vez, quando vier arquivo novo
-            if arquivo_pdf is not None:
-                rag_service.carregar_pdf(arquivo_pdf.name)
+        if arquivo_pdf is not None:
+            rag_service.carregar_pdf(arquivo_pdf.name)
 
             resposta_completa = rag_service.rag(mensagem)
 
@@ -46,11 +39,6 @@ def responder(
             if history:
                 messages.extend(history)
             messages.append({"role": "user", "content": mensagem})
-
-            prompt = formatar_historico(messages)
-
-            resposta_completa = openai.gerar_resposta(prompt, model=modelo, temperature=temperature)
-
 
         # Envia resposta ao frontend
         yield resposta_completa
