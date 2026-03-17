@@ -1,4 +1,3 @@
-# filepath: c:\Users\rondi\Desktop\PROGRAMACAO\PROJETOS PESSOAIS\PROJETO 3 - GEMINI + SQL SERVER\app\services\rag_service.py
 import os
 from dotenv import load_dotenv
 
@@ -8,7 +7,6 @@ from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.vectorstores import FAISS
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from pydantic import SecretStr
 
 load_dotenv()
 
