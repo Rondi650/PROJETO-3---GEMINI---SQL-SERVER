@@ -4,8 +4,6 @@ from datetime import datetime
 
 from app.core.database import SessionLocal
 from app.utils.prompt_builder import formatar_historico
-from app.services.gemini_service import GeminiService
-from app.services.ollama_service import OllamaService
 from app.services.openai_service import OpenAIService
 from app.services.rag_services import RAGService
 from app.repositories.chat_repository import ChatRepository
@@ -13,8 +11,6 @@ from app.schemas.chat import MensagemChat
 
 # Inicializa dependências
 db = SessionLocal()
-gemini = GeminiService()
-ollama = OllamaService()
 openai = OpenAIService()
 rag_service = RAGService()
 chat_repo = ChatRepository(db)
@@ -54,12 +50,8 @@ def responder(
 
             prompt = formatar_historico(messages)
 
-            if servico == "Gemini":
-                resposta_completa = gemini.gerar_resposta(prompt, model=modelo, temperature=temperature)
-            elif servico == "OpenAI":
-                resposta_completa = openai.gerar_resposta(prompt, model=modelo, temperature=temperature)
-            else:
-                resposta_completa = ollama.gerar_resposta(prompt, model=modelo, temperature=temperature)
+            resposta_completa = openai.gerar_resposta(prompt, model=modelo, temperature=temperature)
+
 
         # Envia resposta ao frontend
         yield resposta_completa
@@ -90,9 +82,6 @@ def responder(
 
 # Lista de modelos disponíveis (modo padrão)
 modelos_lista = [
-    "gemma3:4b",
-    "gemini-2.5-flash-lite",
-    "gemini-2.0-flash-lite",
     "gpt-5-nano-2025-08-07",
     "gpt-5-mini-2025-08-07"
 ]
