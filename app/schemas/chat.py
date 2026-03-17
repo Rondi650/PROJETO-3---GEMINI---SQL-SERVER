@@ -8,7 +8,6 @@ class MensagemChat(BaseModel):
     usuario: Annotated[str, Field(max_length=100)]
     mensagem: str
     origem: Annotated[str, Field(max_length=20)]
-    data_hora: str = Field(
-        default_factory=lambda: datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
+    data_hora: datetime
     model: Annotated[str, Field(max_length=100)]
     

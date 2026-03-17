@@ -1,5 +1,6 @@
 # filepath: c:\Users\rondi\Desktop\PROGRAMACAO\PROJETOS PESSOAIS\PROJETO 3 - GEMINI + SQL SERVER\app\services\rag_service.py
-from typing import Optional
+import os
+from dotenv import load_dotenv
 
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -7,9 +8,11 @@ from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.vectorstores import FAISS
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+from pydantic import SecretStr
 
-from app.core.config import OPENAI_API_KEY
+load_dotenv()
 
+apikey = os.getenv('OPENAI_API_KEY')
 
 class RAGService:
     """
@@ -23,7 +26,7 @@ class RAGService:
     """
 
     def __init__(self):
-        if not OPENAI_API_KEY:
+        if not apikey:
             raise ValueError("OPENAI_API_KEY não configurada para usar o RAG.")
 
         self._retriever = None
@@ -43,7 +46,7 @@ class RAGService:
             ),
         ])
 
-        modelo = ChatOpenAI(model="gpt-4o-mini", temperature=0.2)
+        modelo = ChatOpenAI(model="gpt-4o-mini", temperature=0.2, api_key=apikey) #type: ignore
         print("Modelo de linguagem inicializado.")
         return prompt | modelo | StrOutputParser()
 
