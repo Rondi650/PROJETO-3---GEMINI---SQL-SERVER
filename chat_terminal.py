@@ -1,28 +1,22 @@
 import os
-from app.core.database import SessionLocal, engine
+from app.core.database import create_table
 from app.utils.prompt_builder import formatar_historico
-from app.services.gemini_service import GeminiService
-from app.services.ollama_service import OllamaService
 from app.services.openai_service import OpenAIService
 from app.repositories.chat_repository import ChatRepository
 from app.schemas.chat import MensagemChat
-from app.models.chat import Base
 from datetime import datetime
 
 def inicializar_ambiente():
     """Limpa o terminal e cria as tabelas no banco de dados."""
     os.system('cls')
-    Base.metadata.create_all(bind=engine)
+    create_table()
 
 def main():
     """Interface de chat em linha de comando com persistência em banco de dados."""
-    db = SessionLocal()
     try:
         # Inicializa serviços de IA
-        gemini_service = GeminiService()
-        ollama_service = OllamaService()
         openai_service = OpenAIService()
-        chat_repository = ChatRepository(db)
+        chat_repository = ChatRepository()
         
         historico = []  # Mantém histórico da conversa na memória
         
@@ -80,7 +74,7 @@ def main():
             print(f"Bot: {resposta}\n")
                
     finally:
-        db.close()
+        pass
 
 if __name__ == "__main__":
     inicializar_ambiente()

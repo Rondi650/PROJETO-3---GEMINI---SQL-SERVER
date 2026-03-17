@@ -1,17 +1,14 @@
-from app.models.chat import HistoricoChat
 from app.schemas.chat import MensagemChat
+from app.core.database import get_connection
 
 class ChatRepository:
     """Gerencia persistência e recuperação de mensagens de chat no banco de dados."""
     
-    def __init__(self, db_session):
+    def __init__(self):
         """
-        Inicializa o repositório com uma sessão do SQLAlchemy.
-        
-        Args:
-            db_session: Sessão ativa do banco de dados
+        Inicializa o repositório.
         """
-        self.db = db_session
+        pass
         
     def salvar_mensagem(self, mensagem: MensagemChat):
         """
@@ -20,25 +17,21 @@ class ChatRepository:
         Args:
             mensagem: Objeto MensagemChat a ser salvo
         """
-        registro = HistoricoChat(**mensagem.dict())
+        conn = get_connection()
         try:
-            self.db.add(registro)
-            self.db.commit()
+            with conn.cursor() as cursor:
+                sql = ("INSERT INTO HistoricoChat "
+                "(usuario, mensagem, origem, data_hora, model) "
+                "VALUES "
+                "(%s, %s, %s, %s, %s)")
+                cursor.execute(sql, (mensagem.usuario, 
+                                     mensagem.mensagem, 
+                                     mensagem.origem, 
+                                     mensagem.data_hora, 
+                                     mensagem.model))
+                conn.commit()
         except Exception as e:
             print(f'Erro ao salvar mensagem: {e}')
-            self.db.rollback()
-        
-    def obter_historico(self, usuario=None):
-        """
-        Recupera histórico de mensagens do banco de dados.
-        
-        Args:
-            usuario: Filtro opcional por nome de usuário
-        
-        Returns:
-            Lista de mensagens ordenadas por data/hora
-        """
-        query = self.db.query(HistoricoChat)
-        if usuario:
-            query = query.filter(HistoricoChat.usuario == usuario)
-        return query.order_by(HistoricoChat.data_hora).all()
+            conn.rollback()
+        finally:
+            conn.close()

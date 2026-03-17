@@ -1,16 +1,29 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.engine import URL
-from app.core.config import DATABASE_URL
- 
-# Crie a URL de conexão
-connection_url = URL.create(
-    "mssql+pyodbc",
-    query={"odbc_connect": DATABASE_URL}
-)
- 
-# Cria o engine (motor de conexão com SQL Server)
-engine = create_engine(connection_url)
- 
-# SessionLocal é uma fábrica de sessões (conexões com o banco)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+import pymysql
+
+def get_connection():
+    return pymysql.connect(
+        host='localhost',
+        user='rondi',
+        password='rondi',
+        database='RAG',
+        port=3306
+    )
+
+def create_table():
+    conn = get_connection()
+    try:
+        with conn.cursor() as cursor:
+            sql = """
+            CREATE TABLE IF NOT EXISTS HistoricoChat (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                usuario VARCHAR(100),
+                mensagem TEXT,
+                origem VARCHAR(20),
+                data_hora DATETIME,
+                model VARCHAR(100)
+            )
+            """
+            cursor.execute(sql)
+            conn.commit()
+    finally:
+        conn.close()

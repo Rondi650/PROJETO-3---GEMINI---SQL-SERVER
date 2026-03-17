@@ -2,7 +2,7 @@
 import gradio as gr
 from datetime import datetime
 
-from app.core.database import SessionLocal
+from app.core.database import create_table
 from app.utils.prompt_builder import formatar_historico
 from app.services.openai_service import OpenAIService
 from app.services.rag_services import RAGService
@@ -10,17 +10,16 @@ from app.repositories.chat_repository import ChatRepository
 from app.schemas.chat import MensagemChat
 
 # Inicializa dependências
-db = SessionLocal()
+create_table()
 openai = OpenAIService()
 rag_service = RAGService()
-chat_repo = ChatRepository(db)
+chat_repo = ChatRepository()
 
 
 def responder(
     mensagem: str,
     history: list[dict[str, str]],
     system_message: str,
-    servico: str,
     modelo: str,
     temperature: float,
     modo: str,           # "Padrão" ou "RAG (PDF + OpenAI)"

@@ -72,8 +72,7 @@ python main.py
 ```
 app/
 ├── core/           # Configurações de banco de dados
-├── models/         # Modelos SQLAlchemy
-├── repositories/   # Acesso a dados
+├── repositories/   # Acesso a dados com SQL puro
 ├── schemas/        # Schemas de validação
 ├── services/       # Serviços de IA (Gemini, OpenAI, Ollama)
 app_chat.py         # Interface Gradio
