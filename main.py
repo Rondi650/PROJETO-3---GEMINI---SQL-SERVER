@@ -15,7 +15,7 @@ chat_repo = ChatRepository()
 def responder(
     mensagem: str,
     history: list[dict[str, str]],
-    arquivo_pdf = None
+    arquivo_pdf=None
 ):
     """
     Processa mensagem do usuário com RAG e persiste no banco.
@@ -71,4 +71,8 @@ with gr.Blocks(title="Chat IA", theme=gr.themes.Citrus()) as interface:
             )
 
 if __name__ == "__main__":
-    interface.launch(server_port=7860, show_error=True, share=True)
+    interface.launch(
+        server_name="0.0.0.0",
+        server_port=7860,
+        show_error=True,
+        share=True)
