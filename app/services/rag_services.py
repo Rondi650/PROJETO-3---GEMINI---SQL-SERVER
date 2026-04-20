@@ -44,7 +44,7 @@ class RAGService:
             ),
         ])
 
-        modelo = ChatOpenAI(model="gpt-4o-mini", temperature=0.2, api_key=apikey) #type: ignore
+        modelo = ChatOpenAI(model="gpt-5-nano-2025-08-07", temperature=0.2, api_key=apikey) #type: ignore
         print("Modelo de linguagem inicializado.")
         return prompt | modelo | StrOutputParser()
 
