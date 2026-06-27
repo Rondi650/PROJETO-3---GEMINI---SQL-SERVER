@@ -19,17 +19,17 @@ class ChatRepository:
         """
         conn = get_connection()
         try:
-            with conn.cursor() as cursor:
-                sql = ("INSERT INTO HistoricoChat "
-                "(usuario, mensagem, origem, data_hora, model) "
-                "VALUES "
-                "(%s, %s, %s, %s, %s)")
-                cursor.execute(sql, (mensagem.usuario, 
-                                     mensagem.mensagem, 
-                                     mensagem.origem, 
-                                     mensagem.data_hora, 
-                                     mensagem.model))
-                conn.commit()
+            cursor = conn.cursor()
+            sql = ("INSERT INTO HistoricoChat "
+            "(usuario, mensagem, origem, data_hora, model) "
+            "VALUES "
+            "(?, ?, ?, ?, ?)")
+            cursor.execute(sql, (mensagem.usuario, 
+                                 mensagem.mensagem, 
+                                 mensagem.origem, 
+                                 mensagem.data_hora.isoformat(), 
+                                 mensagem.model))
+            conn.commit()
         except Exception as e:
             print(f'Erro ao salvar mensagem: {e}')
             conn.rollback()

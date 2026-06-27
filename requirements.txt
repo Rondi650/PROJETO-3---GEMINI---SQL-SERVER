@@ -74,7 +74,6 @@ pydantic-settings==2.13.1
 pydantic_core==2.41.5
 pydub==0.25.1
 Pygments==2.19.2
-PyMySQL==1.1.0
 pyparsing==3.3.2
 pypdf==4.3.1
 python-dateutil==2.9.0.post0

@@ -1,29 +1,32 @@
-import pymysql
+import sqlite3
+import os
+
+DB_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "data", "rag.db")
 
 def get_connection():
-    return pymysql.connect(
-        host='172.17.0.1',
-        user='rondi',
-        password='rondi',
-        database='RAG',
-        port=3306
-    )
+    """Retorna uma conexão com o banco SQLite."""
+    # Garante que o diretório data existe
+    os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
 
 def create_table():
+    """Cria a tabela de histórico de chat se não existir."""
     conn = get_connection()
     try:
-        with conn.cursor() as cursor:
-            sql = """
-            CREATE TABLE IF NOT EXISTS HistoricoChat (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                usuario VARCHAR(100),
-                mensagem TEXT,
-                origem VARCHAR(20),
-                data_hora DATETIME,
-                model VARCHAR(100)
-            )
-            """
-            cursor.execute(sql)
-            conn.commit()
+        cursor = conn.cursor()
+        sql = """
+        CREATE TABLE IF NOT EXISTS HistoricoChat (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            usuario TEXT,
+            mensagem TEXT,
+            origem TEXT,
+            data_hora TEXT,
+            model TEXT
+        )
+        """
+        cursor.execute(sql)
+        conn.commit()
     finally:
         conn.close()

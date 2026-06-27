@@ -54,7 +54,7 @@ def responder(
 
 
 # Interface web com Gradio
-with gr.Blocks(title="Chat IA", theme=gr.themes.Citrus()) as interface:
+with gr.Blocks(title="Chat IA", theme=gr.themes.Citrus()) as interface:  # type: ignore
     gr.Markdown("## Rondi`s BOT - RAG")
 
     with gr.Row():
