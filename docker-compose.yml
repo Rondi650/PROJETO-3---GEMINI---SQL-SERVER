@@ -9,3 +9,17 @@ services:
       - .env
     volumes:
       - .:/app
+
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ragagent.rule=Host(`ragagent.docker.localhost`)"
+      - "traefik.http.routers.ragagent.entrypoints=websecure"
+      - "traefik.http.routers.ragagent.tls=true"
+      - "traefik.http.services.ragagent.loadbalancer.server.port=7860"
+
+networks:
+  proxy:
+    name: proxy
+    external: true
