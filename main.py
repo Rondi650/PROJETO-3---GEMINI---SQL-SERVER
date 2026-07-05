@@ -56,6 +56,9 @@ def responder(
 # Interface web com Gradio
 with gr.Blocks(title="Chat IA") as interface:
     gr.Markdown("## Rondi`s BOT - RAG")
+    gr.Markdown("Chatbot com RAG (Retrieval-Augmented Generation) e Gradio")
+    gr.Markdown(
+        "Carregue um PDF para que o bot possa responder perguntas com base no conteúdo do arquivo.")
 
     with gr.Row():
         with gr.Column(scale=3):
